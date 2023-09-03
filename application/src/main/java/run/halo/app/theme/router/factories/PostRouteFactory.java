@@ -121,7 +121,7 @@ public class PostRouteFactory implements RouteFactory {
             userHistory.setOperatingSystem(userAgent.getOperatingSystem().toString());
             userHistory.setPageUrl("https://www.lushanwenku.com" + request.path());
             userHistory.setVisitTime(LocalDateTime.now());
-            System.out.println("postResponse userHistory==============================:" + userHistory.toString());
+            // System.out.println("postResponse userHistory==============================:" + userHistory.toString());
             this.r2dbcEntityTemplate.insert(userHistory).subscribe(e -> System.out.println(e));
         } catch (Exception e) {
             throw new RuntimeException(e);

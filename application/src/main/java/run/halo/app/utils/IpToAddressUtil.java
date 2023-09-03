@@ -14,6 +14,9 @@ public class IpToAddressUtil {
   public static String getCityInfo(String ip) {
     String s = sendGet(ip, "D36BZ-EJYWJ-3OSFP-F33JI-PUJPQ-IBFL3");
     Map map = (Map) JSONObject.parseObject(s, Map.class);
+    if(map == null || map.isEmpty()){
+       return null;
+    }
     String message = (String)map.get("message");
     if ("Success".equals(message)) {
       Map result = (Map)map.get("result");
@@ -24,8 +27,7 @@ public class IpToAddressUtil {
       String city = (String)addressInfo.get("city");
       String address = nation + "-" + nation + "-" + province + "-" + city;
       return address;
-    } 
-    System.out.println(message);
+    }
     return null;
   }
   
