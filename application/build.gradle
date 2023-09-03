@@ -48,6 +48,8 @@ tasks.named('jar') {
 
 dependencies {
     implementation project(':api')
+    implementation 'com.alibaba:fastjson:1.2.76'
+    implementation 'nl.bitwalker:UserAgentUtils:1.2.4'
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     annotationProcessor "org.springframework:spring-context-indexer"

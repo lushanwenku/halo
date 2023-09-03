@@ -6,6 +6,8 @@ import static run.halo.app.theme.finders.PostPublicQueryService.FIXED_PREDICATE;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import java.net.InetSocketAddress;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -14,7 +16,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import nl.bitwalker.useragentutils.Browser;
+import nl.bitwalker.useragentutils.UserAgent;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -31,6 +37,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.store.UserHistory;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
@@ -38,6 +45,7 @@ import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.ModelMapUtils;
 import run.halo.app.theme.router.ViewNameResolver;
+import run.halo.app.utils.IpToAddressUtil;
 
 /**
  * The {@link PostRouteFactory} for generate {@link RouterFunction} specific to the template
@@ -55,6 +63,9 @@ public class PostRouteFactory implements RouteFactory {
     private final ViewNameResolver viewNameResolver;
 
     private final ReactiveExtensionClient client;
+
+    @Autowired
+    R2dbcEntityTemplate r2dbcEntityTemplate;
 
     @Override
     public RouterFunction<ServerResponse> create(String pattern) {
@@ -96,6 +107,25 @@ public class PostRouteFactory implements RouteFactory {
     @NonNull
     private Mono<ServerResponse> postResponse(ServerRequest request,
         PostPatternVariable patternVariable) {
+        try {
+            String ip = ((InetSocketAddress)request.remoteAddress().get()).getHostString();
+            ServerRequest.Headers headers = request.headers();
+            String userAgentStr = headers.firstHeader("User-Agent");
+            UserAgent userAgent = UserAgent.parseUserAgentString(userAgentStr);
+            Browser browser = userAgent.getBrowser();
+            String browserName = browser.getName();
+            UserHistory userHistory = new UserHistory();
+            userHistory.setIp(ip);
+            userHistory.setIpAddress(IpToAddressUtil.getCityInfo(ip));
+            userHistory.setBrowser(browserName);
+            userHistory.setOperatingSystem(userAgent.getOperatingSystem().toString());
+            userHistory.setPageUrl("https://www.lushanwenku.com" + request.path());
+            userHistory.setVisitTime(LocalDateTime.now());
+            System.out.println("postResponse userHistory==============================:" + userHistory.toString());
+            this.r2dbcEntityTemplate.insert(userHistory).subscribe(e -> System.out.println(e));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         Mono<PostVo> postVoMono = bestMatchPost(patternVariable);
         return postVoMono
             .flatMap(postVo -> {
