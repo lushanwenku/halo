@@ -16,12 +16,12 @@ spring:
 
 halo:
   console:
-    proxy:
-      endpoint: http://localhost:3000/
-      enabled: true
-  plugin:
-    runtime-mode: development # development, deployment
-  work-dir: ${user.home}/halo2-dev
+#    proxy:
+#      endpoint: http://localhost:3000/
+#      enabled: true
+#  plugin:
+#    runtime-mode: development # development, deployment
+  work-dir: /home/lushanwenku/halo2-dev
 logging:
   level:
     run.halo.app: DEBUG
