@@ -39,8 +39,8 @@ halo:
       disabled: true
   security:
     initializer:
-      super-admin-username: lushanwenku
-      super-admin-password: lushanwenku!@#123
+      super-admin-username: 1
+      super-admin-password: 1
   work-dir: /home/lushanwenku/halo2-dev
   plugin:
     plugins-root: ${halo.work-dir}/plugins

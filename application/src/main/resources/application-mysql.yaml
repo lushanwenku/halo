@@ -2,8 +2,8 @@ spring:
   r2dbc:
     url: r2dbc:pool:mysql://123.56.186.136:3306/halodb
 #    url: r2dbc:pool:mysql://123.56.186.136:3306/halodb_dev
-    username: lushanwenku
-    password: Lushanwenku!@#123
+    username:
+    password:
   sql:
     init:
       mode: always
